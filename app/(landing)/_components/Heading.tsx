@@ -35,7 +35,7 @@ export const Heading = () => {
       )}
       {!isAuthenticated && !isLoading && (
         <SignInButton mode="modal" >
-          <Button asChild>
+          <Button >
             Get Zotion free
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
