@@ -1,24 +1,32 @@
+/* eslint-disable react/jsx-no-duplicate-props */
 "use client";
 
 import { cn } from "@/lib/utils";
 import {
   ChevronsLeft,
   MenuIcon,
+  Plus,
   PlusCircle,
   Search,
   Settings,
+  Trash,
 } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { usePathname } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import UserItem from "./UserItem";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Item } from "./Item";
 import { toast } from "sonner";
+import { DocumentList } from "./DocumentList";
 
 const Navigation = () => {
-  const documents = useQuery(api.documents.get);
   const create = useMutation(api.documents.create);
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -138,18 +146,31 @@ const Navigation = () => {
             label="Search"
             icon={Search}
             isSearch
-            onClick={() => { }}
+            onClick={() => {}}
           />
           <Item
             onClick={handleCreate}
             label="Settings"
             icon={Settings}
-            onClick={() => { }}
+            // eslint-disable-next-line react/jsx-no-duplicate-props
+            onClick={() => {}}
           />
           <Item onClick={handleCreate} label="New Page" icon={PlusCircle} />
         </div>
         <div className="mt-4">
-          <p>{documents?.map((doc) => <p key={doc._id}>{doc.title}</p>)}</p>
+          <DocumentList />
+          <Item onClick={handleCreate} icon={Plus} label="Add a page" />
+          <Popover>
+            <PopoverTrigger className="mt-4 w-full">
+              <Item label="Trash" icon={Trash} />
+            </PopoverTrigger>
+            <PopoverContent
+              side={isMobile ? "bottom" : "right"}
+              className="w-72 p-0"
+            >
+              <p>Trash Box</p>
+            </PopoverContent>
+          </Popover>
         </div>
         <div
           onMouseDown={handleMouseDown}
