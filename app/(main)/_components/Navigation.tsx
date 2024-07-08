@@ -25,8 +25,13 @@ import { api } from "@/convex/_generated/api";
 import { Item } from "./Item";
 import { toast } from "sonner";
 import { DocumentList } from "./DocumentList";
+import { TrashBox } from "./TrashBox";
+import { useSearch } from "@/hooks/useSearch";
+import { useSettings } from "@/hooks/useSettings";
 
 const Navigation = () => {
+  const search = useSearch();
+  const settings = useSettings()
   const create = useMutation(api.documents.create);
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -141,20 +146,15 @@ const Navigation = () => {
         </div>
         <div>
           <UserItem />
+          <Item label="Search" icon={Search} isSearch onClick={search.onOpen} />
+
           <Item
-            onClick={handleCreate}
-            label="Search"
-            icon={Search}
-            isSearch
-            onClick={() => {}}
-          />
-          <Item
-            onClick={handleCreate}
             label="Settings"
             icon={Settings}
             // eslint-disable-next-line react/jsx-no-duplicate-props
-            onClick={() => {}}
+            onClick={settings.onOpen}
           />
+
           <Item onClick={handleCreate} label="New Page" icon={PlusCircle} />
         </div>
         <div className="mt-4">
@@ -168,7 +168,7 @@ const Navigation = () => {
               side={isMobile ? "bottom" : "right"}
               className="w-72 p-0"
             >
-              <p>Trash Box</p>
+              <TrashBox />
             </PopoverContent>
           </Popover>
         </div>
