@@ -6,6 +6,9 @@ import { useCoverImage } from "@/hooks/useCoverImage";
 import { useMutation } from "convex/react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { SingleImageDropzone } from "../single-image-dropzone";
+import { useEdgeStore } from "@/lib/edgestore";
+import { Id } from "@/convex/_generated/dataModel";
 
 export const CoverImageModal = () => {
   const params = useParams();
@@ -15,6 +18,37 @@ export const CoverImageModal = () => {
 
   const update = useMutation(api.documents.update);
   const coverImage = useCoverImage();
+  const { edgestore } = useEdgeStore();
+
+  const onClose = () => {
+    setFile(undefined);
+    setIsSubmitting(false);
+    coverImage.onClose();
+  };
+
+  const onChange = async (file?: File) => {
+    if (file) {
+      setIsSubmitting(true);
+      setFile(file);
+
+      const res = await edgestore.publicFiles.upload({
+        file,
+        options: {
+          //replacing the current url which comes from useCoverImage hook
+          replaceTargetUrl: coverImage.url,
+        },
+      });
+
+      await update({
+        id: params.documentId as Id<"documents">,
+        //updating the url taking from it res
+        coverImage: res.url,
+      });
+
+      onClose();
+    }
+  };
+
 
   return (
     <Dialog open={coverImage.isOpen} onOpenChange={coverImage.onClose}>
@@ -22,13 +56,12 @@ export const CoverImageModal = () => {
         <DialogHeader>
           <h2 className="text-center text-lg font-semibold">Cover Image</h2>
         </DialogHeader>
-        {/* <SingleImageDropzone
+        <SingleImageDropzone
           className="w-full outline-none"
           disabled={isSubmitting}
           value={file}
           onChange={onChange}
-        /> */}
-        <div>TODO Upload image</div>
+        />
       </DialogContent>
     </Dialog>
   );
