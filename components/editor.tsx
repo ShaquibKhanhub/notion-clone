@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import { BlockNoteEditor, PartialBlock } from '@blocknote/core';
-import { BlockNoteView, useBlockNote } from '@blocknote/react';
-import '@blocknote/core/style.css';
-import { useTheme } from 'next-themes';
-import { useEdgeStore } from '@/lib/edgestore';
+import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
+import { useTheme } from "next-themes";
+import { useEdgeStore } from "@/lib/edgestore";
+import "@blocknote/core/style.css";
+import "@blocknote/mantine/style.css";
 
 interface EditorProps {
   onChange: (value: string) => void;
@@ -15,45 +16,35 @@ interface EditorProps {
 
 const Editor = ({ onChange, initialContent, editable }: EditorProps) => {
   const { resolvedTheme } = useTheme();
+
   const { edgestore } = useEdgeStore();
 
   const handleUpload = async (file: File) => {
     const res = await edgestore.publicFiles.upload({
       file,
     });
+
     return res.url;
   };
 
-  const { editor } = useBlockNote({
-    editable,
+  const editor: BlockNoteEditor = useCreateBlockNote({
     initialContent: initialContent
       ? (JSON.parse(initialContent) as PartialBlock[])
       : undefined,
     uploadFile: handleUpload,
   });
 
-  // Effect to handle editor content changes
-  useEffect(() => {
-    if (!editor) return;
-
-    const handleEditorChange = () => {
-      onChange(JSON.stringify(editor.topLevelBlocks, null, 2));
-    };
-
-    editor.on('change', handleEditorChange);
-
-    return () => {
-      editor.off('change', handleEditorChange);
-    };
-  }, [editor, onChange]);
-
-  if (!editor) return null; // Ensure editor is initialized
+  const handleEditorChange = () => {
+    onChange(JSON.stringify(editor.document, null, 2));
+  };
 
   return (
     <div>
       <BlockNoteView
+        editable={editable}
         editor={editor}
-        theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+        theme={resolvedTheme === "dark" ? "dark" : "light"}
+        onChange={handleEditorChange}
       />
     </div>
   );
