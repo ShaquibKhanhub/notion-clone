@@ -28,7 +28,7 @@ export const UserItem = () => {
               <AvatarImage src={user?.imageUrl} />
             </Avatar>
             <span className="font-medium line-clamp-1 text-sm">
-              {user?.fullName}&apos; Zotion
+              {user?.username}&apos; Zotion
             </span>
           </div>
           <ChevronsLeftRight className="ml-2 h-4 w-4 rotate-90 text-muted-foreground" />
